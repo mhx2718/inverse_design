@@ -1,0 +1,6 @@
+extends: ../baselines/cdm.yaml
+diffusion:
+  sampling_batch_size: 2
+parameters:
+  pool_size: 2
+  n_output: 2

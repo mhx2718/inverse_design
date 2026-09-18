@@ -1,0 +1,18 @@
+method: abc-mcmc
+parameters:
+  bandwidth: null
+  n_output: 50
+  seed: 0
+mcmc:
+  dimension: 16
+  num_chains: 1
+  burn_in_accepts: 3500
+  production_accepts: 35000
+  max_steps: 100000000
+  initial_covariance_scale: 0.0196
+  adaptation_scale: 1.0
+  covariance_jitter: 1.0e-6
+  temperature: 1.0
+  seed: 0
+  keep_every_state: true
+  progress: true

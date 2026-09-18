@@ -1,0 +1,10 @@
+extends: ../baselines/ga.yaml
+parameters:
+  generations: 2
+  population_size: 16
+  parents_per_generation: 4
+  initial_lower_bound: -3.0
+  initial_upper_bound: 3.0
+  elite_count: 2
+  kept_parent_count: 2
+  top_k: 5

@@ -1,0 +1,23 @@
+method: cdm
+network:
+  design_dimension: 16
+  response_dimension: 10
+  base_channels: 32
+  time_embedding_dimension: 128
+  depth: 2
+  dropout: 0.3
+  latent_length: 128
+  use_cbam: true
+  use_multihead_attention: true
+  attention_heads: 4
+  attention_residual_scale: 0.1
+diffusion:
+  timesteps: 1000
+  beta_start: 1.0e-4
+  beta_end: 0.02
+  sampling_batch_size: 512
+  seed: 0
+parameters:
+  pool_size: 35000
+  n_output: 50
+  seed: 0

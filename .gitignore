@@ -1,0 +1,29 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+outputs/*
+!outputs/.gitkeep
+*.log
+
+# Generated outputs
+outputs/
+*.log
+
+# Python caches and build files
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# Local environments
+.venv/
+venv/
+
+# macOS metadata
+.DS_Store

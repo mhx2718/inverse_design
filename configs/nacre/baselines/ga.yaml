@@ -1,0 +1,9 @@
+parameters:
+  generations: 400
+  population_size: 200
+  parents_per_generation: 30
+  design_dimension: 10
+  elite_count: 30
+  kept_parent_count: 30
+  top_k: 4000
+  seed: 0

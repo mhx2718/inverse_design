@@ -1,0 +1,15 @@
+method: ga
+parameters:
+  generations: 400
+  population_size: 200
+  parents_per_generation: 30
+  design_dimension: 16
+  initial_lower_bound: -6.0
+  initial_upper_bound: 6.0
+  mutation_probability: 0.30
+  mutation_standard_deviation: 1.0
+  elite_count: 30
+  kept_parent_count: 30
+  top_k: 50
+  unique_decimals: 6
+  seed: 0

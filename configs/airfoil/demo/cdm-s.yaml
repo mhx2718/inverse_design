@@ -1,0 +1,4 @@
+extends: ../baselines/cdm-s.yaml
+cdm_config: configs/airfoil/demo/cdm.yaml
+parameters:
+  n_output: 2

@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "Please cite the associated article when using this software."
+title: "GUIDe: Generative and Uncertainty-Informed Inverse Design for On-Demand Nonlinear Functional Responses"
+type: software
+authors:
+  - family-names: Mu
+    given-names: Haoxuan Dylan
+  - family-names: Tang
+    given-names: Mingjian
+  - family-names: Gao
+    given-names: Wei
+  - family-names: Chen
+    given-names: Wei Wayne
+license: MIT

@@ -1,0 +1,4 @@
+cdm_config: configs/nacre/baselines/cdm.yaml
+parameters:
+  n_output: 4000
+  zero_likelihood_tolerance: 1.0e-12

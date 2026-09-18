@@ -1,0 +1,55 @@
+benchmark: nacre
+project_root: ..
+paths:
+  preprocessor: data/nacre/preprocessor.npz
+  targets: data/nacre/targets.npz
+  forward_checkpoint: checkpoints/nacre_forward.h5
+  cdm_checkpoint: checkpoints/nacre_cdm.pt
+experiment:
+  target_index: 0
+  tolerance: null
+  seed: 0
+  output_root: outputs/nacre
+  method_config_directory: configs/nacre/baselines
+  target_strain_multiplier: 1.0
+forward_model:
+  mc_samples: 30
+  std_scale: 0.7413102413009177
+  kernel_length_scale: 0.35
+  jitter: 0.05
+  dropout_mode: fixed
+  seed: 0
+  batch_size: 8
+constraints: {}
+likelihood:
+  backend: mvnun
+  max_points: 100000
+  absolute_tolerance: 1.0e-6
+  relative_tolerance: 5.0e-3
+support_search:
+  n_particles: 80
+  iterations: 60
+  cognitive: 1.49618
+  social: 1.49618
+  inertia: 0.7298
+  lower_bound: -3.0
+  upper_bound: 3.0
+  nonzero_threshold: 1.0e-10
+  objective:
+    distance_statistic: mahalanobis
+    support_covariance_jitter: 0.0
+mcmc:
+  dimension: 10
+  num_chains: 1
+  burn_in_accepts: 1000
+  production_accepts: 4000
+  max_steps: 2000000
+  initial_covariance_scale: 0.01
+  adaptation_scale: 2.38
+  covariance_jitter: 1.0e-6
+  temperature: 1.0
+  keep_every_state: true
+  progress: true
+output:
+  n_output: 4000
+  unique_decimals: null

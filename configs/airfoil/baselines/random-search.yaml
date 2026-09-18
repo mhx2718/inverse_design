@@ -1,0 +1,10 @@
+method: random-search
+parameters:
+  lower_quantile: 0.005
+  upper_quantile: 0.995
+  expansion_factor: 3.0
+  pool_size: 35000
+  n_output: 50
+  proposal_batch_size: 100000
+  max_total_draws: 20000000
+  seed: 0

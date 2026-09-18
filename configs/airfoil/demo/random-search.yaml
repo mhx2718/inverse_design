@@ -1,0 +1,6 @@
+extends: ../baselines/random-search.yaml
+parameters:
+  pool_size: 128
+  n_output: 5
+  proposal_batch_size: 512
+  max_total_draws: 100000

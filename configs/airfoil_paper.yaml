@@ -1,0 +1,72 @@
+benchmark: airfoil
+project_root: ..
+paths:
+  targets: data/airfoil/targets.npy
+  target_indices: data/airfoil/target_indices.npy
+  constraints: data/airfoil/constraints.npz
+  training_latent: data/airfoil/latent_train.npy
+  preprocessor: data/airfoil/preprocessor.npz
+  standardized_aoa: data/airfoil/standardized_aoa.npy
+  sngp_checkpoint: checkpoints/airfoil_sngp.pt
+  cdm_checkpoint: checkpoints/airfoil_cdm.pt
+experiment:
+  target_index: 0
+  tolerance: 0.025
+  seed: 0
+  output_root: outputs/airfoil
+  method_config_directory: configs/airfoil/baselines
+forward_model:
+  mean_batch_size: 4096
+  distribution_batch_size: 16
+  sngp:
+    latent_dimension: 16
+    features: 256
+    depth: 6
+    spectral_normalization: true
+    spectral_norm_coefficient: 0.95
+    n_power_iterations: 1
+    dropout_rate: 0.0
+    shape_embedding_dimension: 200
+    aoa_embedding_dimension: 32
+    gp_projection_dimension: 256
+    random_feature_dimension: 4096
+    normalize_gp_features: true
+    random_feature_scale: 2.0
+    ridge_penalty: 0.1
+    covariance_ridge_scaling: true
+    jl_projection_std: 0.0625
+    num_outputs: 1
+likelihood:
+  backend: mvnun
+  covariance_scale: 0.004325925666499213
+  covariance_jitter: 1.01e-06
+  max_points: 200000
+support_search:
+  optimizer: pso
+  n_particles: 80
+  iterations: 15
+  cognitive: 1.49445
+  social: 1.49445
+  inertia: 0.729
+  lower_bound: -3.0
+  upper_bound: 3.0
+  nonzero_threshold: 1.0e-10
+  coverage_weight: 1.0
+  support_covariance_jitter: 0.001
+  distance_statistic: squared
+mcmc:
+  dimension: 16
+  num_chains: 1
+  burn_in_accepts: 3500
+  production_accepts: 35000
+  max_steps: 100000000
+  initial_covariance_scale: 0.0196
+  adaptation_scale: 2.38
+  covariance_jitter: 1.0e-06
+  temperature: 0.15
+  seed: 0
+  keep_every_state: true
+  progress: true
+output:
+  unique_decimals: null
+  n_output: null

@@ -1,0 +1,8 @@
+extends: ../baselines/mcmc-bi.yaml
+parameters:
+  n_output: 5
+mcmc:
+  burn_in_accepts: 1
+  production_accepts: 3
+  max_steps: 2000
+  progress: false
