@@ -1,2 +1,2 @@
 # Install from the repository root; dependency versions are defined in pyproject.toml.
--e .[optimization]
+-e .[airfoil,nacre]
