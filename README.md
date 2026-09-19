@@ -130,7 +130,7 @@ If you use this repository, please cite the [GUIDe paper](https://arxiv.org/abs/
 }
 ```
 
-Citation metadata is also available in [CITATION.cff](CITATION.cff).
+Citation metadata of the software is available in [CITATION.cff](CITATION.cff).
 
 ## ⚖️ License
 
