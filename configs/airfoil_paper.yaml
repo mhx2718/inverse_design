@@ -1,12 +1,10 @@
 benchmark: airfoil
 project_root: ..
 paths:
+  dataset: data/airfoil/dataset.npz
   targets: data/airfoil/targets.npy
-  target_indices: data/airfoil/target_indices.npy
   constraints: data/airfoil/constraints.npz
-  training_latent: data/airfoil/latent_train.npy
   preprocessor: data/airfoil/preprocessor.npz
-  standardized_aoa: data/airfoil/standardized_aoa.npy
   sngp_checkpoint: checkpoints/airfoil_sngp.pt
   cdm_checkpoint: checkpoints/airfoil_cdm.pt
 experiment:

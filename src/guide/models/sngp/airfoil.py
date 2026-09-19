@@ -16,23 +16,6 @@ from guide.types import PredictiveDistribution
 from .feature_extractor import PointNetFC
 from .laplace import Laplace
 
-DEFAULT_STANDARDIZED_AOA = np.array(
-    [
-        -1.5666989,
-        -1.2185436,
-        -0.8703883,
-        -0.52223295,
-        -0.17407766,
-        0.17407766,
-        0.52223295,
-        0.8703883,
-        1.2185436,
-        1.5666989,
-    ],
-    dtype=np.float32,
-)
-
-
 @dataclass(frozen=True)
 class AirfoilSNGPConfig:
     latent_dimension: int = 16
@@ -208,7 +191,7 @@ class AirfoilSNGPForwardModel:
         self,
         model: Laplace,
         *,
-        standardized_aoa: ArrayLike = DEFAULT_STANDARDIZED_AOA,
+        standardized_aoa: ArrayLike,
         mean_batch_size: int = 4096,
         distribution_batch_size: int = 16,
     ) -> None:

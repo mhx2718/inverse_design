@@ -98,9 +98,32 @@ The pretrained checkpoints are `airfoil_sngp.pt`, `airfoil_cdm.pt`, `nacre_forwa
 
 ### Data
 
-Airfoil designs have 16 standardized PCA coordinates; nacre designs have 10 standardized material parameters. Each benchmark includes a `preprocessor.npz` file.
+**Airfoil (`data/airfoil/`)**
 
-Nacre `dataset.npz` contains `X_train`, `X_val`, and `X_test` with shape `(N, 100, 11)` (10 design parameters followed by strain), and `y_train`, `y_val`, and `y_test` with shape `(N, 100)` in MPa. Its `targets.npz` stores response curves, strains, target IDs, tolerances, and response masks.
+Designs have 16 standardized PCA coordinates. Each response curve contains 10 values over angles of attack from -5 to 15 degrees.
+
+| File | Contents |
+|---|---|
+| `dataset.npz` | Training, validation, and test data; native geometries; the angle-of-attack grid; and test-set target indices. |
+| `preprocessor.npz` | PCA components, latent and angle-of-attack scalers, and the geometry reconstruction grid. |
+| `constraints.npz` | Linear geometric constraints in standardized PCA coordinates. |
+| `targets.npy` | The 50 benchmark response curves, with shape `(50, 10)`. |
+
+For each split, `latent_*` has shape `(N, 16)` and `geometry_*` has shape `(N, 192, 2)`. Their associated responses, `response_*` and `geometry_response_*`, each have shape `(N, 10)`.
+
+Both generation entry points read targets directly from `targets.npy`. Custom target files must have shape `(n_targets, 10)` and use the same response scale and angle-of-attack order. Set `paths.targets` to select a different file.
+
+**Nacre (`data/nacre/`)**
+
+Designs have 10 standardized material parameters. Each stress-strain response curve contains 100 stress values in MPa.
+
+| File | Contents |
+|---|---|
+| `dataset.npz` | Training, validation, and test inputs and stress responses. |
+| `preprocessor.npz` | The input scaler and physical strain grid. |
+| `targets.npz` | Two OOD target curves, the strain grid, target IDs, tolerances, and response masks. |
+
+For each split, `X_*` has shape `(N, 100, 11)`, with 10 design parameters followed by strain at each response point, and `y_*` has shape `(N, 100)`. The two benchmark targets are `brittle` and `plateau`.
 
 ### Generated results
 

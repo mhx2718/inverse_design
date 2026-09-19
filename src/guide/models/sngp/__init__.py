@@ -1,7 +1,6 @@
 """SNGP model components."""
 
 from .airfoil import (
-    DEFAULT_STANDARDIZED_AOA,
     AirfoilSNGPConfig,
     AirfoilSNGPForwardModel,
     build_airfoil_sngp,
@@ -13,7 +12,6 @@ from .laplace import Laplace, RandomFourierFeatures
 __all__ = [
     "AirfoilSNGPConfig",
     "AirfoilSNGPForwardModel",
-    "DEFAULT_STANDARDIZED_AOA",
     "FCResNet",
     "Laplace",
     "PointNetFC",

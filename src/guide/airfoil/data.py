@@ -1,7 +1,8 @@
-"""Target loading and MCMC initialization for airfoil generation."""
+"""Per-design airfoil data and MCMC initialization."""
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
@@ -10,23 +11,80 @@ from numpy.typing import ArrayLike, NDArray
 from .constraints import LinearInequalityConstraint
 
 
-def load_targets(
-    target_path: str | Path,
-    index_path: str | Path | None = None,
-) -> tuple[NDArray[np.float64], NDArray[np.int64] | None]:
-    """Load target curves and optional source indices."""
+@dataclass(frozen=True)
+class AirfoilSplit:
+    """Model data and retained geometry/response records for one split."""
 
-    targets = np.asarray(np.load(target_path, allow_pickle=False), dtype=np.float64)
-    if targets.ndim != 2 or targets.shape[1] != 10:
-        raise ValueError(f"Expected targets with shape (n_targets, 10), got {targets.shape}.")
+    latent: NDArray[np.float64]
+    response: NDArray[np.float64]
+    geometry: NDArray[np.float64]
+    geometry_response: NDArray[np.float64]
+
+    def __post_init__(self) -> None:
+        if self.latent.ndim != 2 or self.latent.shape[1] != 16:
+            raise ValueError("latent must have shape (n_designs, 16).")
+        count = self.latent.shape[0]
+        for name, shape in (
+            ("latent", (count, 16)),
+            ("response", (count, 10)),
+            ("geometry", (count, 192, 2)),
+            ("geometry_response", (count, 10)),
+        ):
+            values = getattr(self, name)
+            if values.shape != shape or not np.all(np.isfinite(values)):
+                raise ValueError(f"{name} must contain finite values with shape {shape}.")
+        if count == 0:
+            raise ValueError("Airfoil splits must contain at least one design.")
+
+
+@dataclass(frozen=True)
+class AirfoilDataset:
+    """Compact splits, shared AoAs, and indices selecting geometry test responses."""
+
+    train: AirfoilSplit
+    val: AirfoilSplit
+    test: AirfoilSplit
+    angles_of_attack: NDArray[np.float64]
+    target_indices: NDArray[np.int64]
+
+    def __post_init__(self) -> None:
+        if self.angles_of_attack.shape != (10,) or not np.all(
+            np.isfinite(self.angles_of_attack)
+        ):
+            raise ValueError("angles_of_attack must contain 10 finite angles in degrees.")
+        indices = self.target_indices
+        if indices.ndim != 1 or indices.size == 0 or not np.issubdtype(
+            indices.dtype, np.integer
+        ):
+            raise ValueError("target_indices must be a nonempty one-dimensional integer array.")
+        if np.any(indices < 0) or np.any(indices >= self.test.geometry_response.shape[0]):
+            raise ValueError("target_indices contains an out-of-range geometry test index.")
+
+    @classmethod
+    def load(cls, path: str | Path) -> AirfoilDataset:
+        with np.load(path, allow_pickle=False) as data:
+            splits = {
+                split: AirfoilSplit(**{
+                    name: np.asarray(data[f"{name}_{split}"], dtype=np.float64)
+                    for name in ("latent", "response", "geometry", "geometry_response")
+                })
+                for split in ("train", "val", "test")
+            }
+            return cls(
+                **splits,
+                angles_of_attack=np.asarray(data["angles_of_attack"], dtype=np.float64),
+                target_indices=data["target_indices"],
+            )
+
+
+def load_targets(path: str | Path) -> NDArray[np.float64]:
+    """Load target response curves from a NumPy array of shape (n_targets, 10)."""
+    targets = np.asarray(np.load(path, allow_pickle=False), dtype=np.float64)
+    if targets.ndim != 2 or targets.shape[0] == 0 or targets.shape[1] != 10:
+        raise ValueError("Airfoil targets must have shape (n_targets, 10).")
     if not np.all(np.isfinite(targets)):
-        raise ValueError("Target array contains non-finite values.")
-    indices = None
-    if index_path is not None:
-        indices = np.asarray(np.load(index_path, allow_pickle=False), dtype=np.int64).reshape(-1)
-        if indices.size != targets.shape[0]:
-            raise ValueError("Target indices and target curves contain different numbers of entries.")
-    return targets, indices
+        raise ValueError("Airfoil targets must contain only finite values.")
+    return targets
 
 
 def draw_admissible_gaussian_initial_design(

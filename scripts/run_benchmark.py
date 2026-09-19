@@ -21,17 +21,16 @@ METHODS = {
 
 def load_target_ids(config, root, tolerance):
     """Use the same target names and validation as single-target generation."""
-    target_path = root / config["paths"]["targets"]
     if config.get("benchmark", "airfoil") == "airfoil":
         from guide.airfoil.data import load_targets
 
-        indices = config["paths"].get("target_indices")
-        targets, _ = load_targets(target_path, root / indices if indices else None)
+        targets = load_targets(root / config["paths"]["targets"])
         return [f"airfoil-target-{i:03d}" for i in range(len(targets))]
 
     from guide.nacre.representation import NacreRepresentation
     from guide.nacre.targets import load_nacre_target
 
+    target_path = root / config["paths"]["targets"]
     representation = NacreRepresentation.load(root / config["paths"]["preprocessor"])
     if target_path.suffix == ".npz":
         with np.load(target_path, allow_pickle=False) as data:

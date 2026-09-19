@@ -11,9 +11,11 @@ import numpy as np
 
 from guide.airfoil.constraints import LinearInequalityConstraint
 from guide.airfoil.data import (
+    AirfoilDataset,
     draw_admissible_gaussian_initial_design,
     load_targets,
 )
+from guide.airfoil.representation import AirfoilPCARepresentation
 from guide.core.pipeline import GUIDeGenerationConfig, GUIDeGenerator
 from guide.baselines import (
     ABCMCMCBaseline,
@@ -86,16 +88,10 @@ def _require(path: Path, label: str) -> Path:
 
 def _load_target(
     target_path: Path,
-    target_indices_path: Path | None,
     target_index: int,
     tolerance: float,
 ) -> TargetSpecification:
-    targets, indices = load_targets(
-        _require(target_path, "target array"),
-        _require(target_indices_path, "target-index array")
-        if target_indices_path is not None
-        else None,
-    )
+    targets = load_targets(target_path)
     if not 0 <= target_index < targets.shape[0]:
         raise IndexError(
             f"target_index={target_index} is outside [0, {targets.shape[0] - 1}]."
@@ -104,8 +100,6 @@ def _load_target(
         "source": str(target_path),
         "index": target_index,
     }
-    if indices is not None:
-        metadata["held_out_test_index"] = int(indices[target_index])
     return TargetSpecification(
         response=targets[target_index],
         tolerance=tolerance,
@@ -118,6 +112,7 @@ def _build_sngp(
     config: dict[str, Any],
     paths: dict[str, Path],
     device: str | None,
+    standardized_aoa: np.ndarray,
 ) -> AirfoilSNGPForwardModel:
     model_config = AirfoilSNGPConfig(**config["forward_model"]["sngp"])
     model = load_airfoil_sngp(
@@ -125,9 +120,6 @@ def _build_sngp(
         config=model_config,
         device=device,
         strict=True,
-    )
-    standardized_aoa = np.load(
-        _require(paths["standardized_aoa"], "standardized AoA asset")
     )
     return AirfoilSNGPForwardModel(
         model,
@@ -231,9 +223,12 @@ def run_from_args(arguments: argparse.Namespace) -> Path:
         for key in ("support_search", "mcmc"):
             common.setdefault(key, {})["seed"] = seed
 
+    dataset = AirfoilDataset.load(_require(paths["dataset"], "airfoil dataset"))
+    representation = AirfoilPCARepresentation.load(
+        _require(paths["preprocessor"], "airfoil preprocessor")
+    )
     target = _load_target(
-        paths["targets"],
-        paths.get("target_indices"),
+        _require(paths["targets"], "airfoil targets"),
         target_index,
         tolerance,
     )
@@ -259,13 +254,13 @@ def run_from_args(arguments: argparse.Namespace) -> Path:
             if section in method_config:
                 method_config[section]["seed"] = seed
     if method in {"random-search", "mcmc-bi", "abc-mcmc"}:
-        training_latent = np.asarray(
-            np.load(_require(paths["training_latent"], "training latent array")),
-            dtype=np.float64,
-        )
+        training_latent = dataset.train.latent
 
     # All methods use the same SNGP mean; probability-based methods also use its covariance.
-    forward = _build_sngp(common, paths, arguments.device)
+    forward = _build_sngp(
+        common, paths, arguments.device,
+        representation.transform_aoa(dataset.angles_of_attack),
+    )
     sngp_label = paths["sngp_checkpoint"].stem
 
     if method == "guide":
@@ -412,7 +407,7 @@ def run_from_args(arguments: argparse.Namespace) -> Path:
         raise ValueError(f"Unknown method: {method}")
 
     generation.metadata.setdefault("forward_model", sngp_label)
-    generation.metadata.setdefault("target_source", str(paths["targets"]))
+    generation.metadata.setdefault("target_source", str(paths["dataset"]))
 
     output_root = project_root / experiment.get("output_root", "outputs")
     output_directory = (
