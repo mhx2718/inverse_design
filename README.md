@@ -114,6 +114,8 @@ Demo runs save to `outputs/demo/<benchmark>/<method>/<target>/`; paper configura
 | `target.npz` | Target used for the run |
 | `run_configuration.json` | Run settings |
 
+To evaluate the generated designs, compute their responses using the corresponding external simulator (Abaqus/Standard for nacre and SU2 for airfoils; neither is included in this repository). The simulation setups and parameters are detailed in the Methods section of the paper.
+
 ## 📚 Citation
 
 If you use this repository, please cite the [GUIDe paper](https://arxiv.org/abs/2509.05641):
