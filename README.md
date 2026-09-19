@@ -100,30 +100,28 @@ The pretrained checkpoints are `airfoil_sngp.pt`, `airfoil_cdm.pt`, `nacre_forwa
 
 **Airfoil (`data/airfoil/`)**
 
-Designs have 16 standardized PCA coordinates. Each response curve contains 10 values over angles of attack from -5 to 15 degrees.
+Designs have 16 standardized PCA coordinates. Responses contain 10 values over angles of attack from −5 to 15 degrees.
 
-| File | Contents |
-|---|---|
-| `dataset.npz` | Training, validation, and test data; native geometries; the angle-of-attack grid; and test-set target indices. |
-| `preprocessor.npz` | PCA components, latent and angle-of-attack scalers, and the geometry reconstruction grid. |
-| `constraints.npz` | Linear geometric constraints in standardized PCA coordinates. |
-| `targets.npy` | The 50 benchmark response curves, with shape `(50, 10)`. |
+| File               | Contents                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------ |
+| `dataset.npz`      | Train/validation/test splits, native geometries, angle-of-attack grid, and target indices. |
+| `preprocessor.npz` | PCA components, input scalers, and geometry reconstruction grid.                           |
+| `constraints.npz`  | Linear geometric constraints in standardized PCA coordinates.                              |
+| `targets.npy`      | 50 benchmark response curves, with shape `(50, 10)`.                                       |
 
-For each split, `latent_*` has shape `(N, 16)` and `geometry_*` has shape `(N, 192, 2)`. Their associated responses, `response_*` and `geometry_response_*`, each have shape `(N, 10)`.
-
-Both generation entry points read targets directly from `targets.npy`. Custom target files must have shape `(n_targets, 10)` and use the same response scale and angle-of-attack order. Set `paths.targets` to select a different file.
+Per split, `latent_*` has shape `(N, 16)` and `geometry_*` has shape `(N, 192, 2)`. Their corresponding arrays, `response_*` and `geometry_response_*`, both have shape `(N, 10)`.
 
 **Nacre (`data/nacre/`)**
 
-Designs have 10 standardized material parameters. Each stress-strain response curve contains 100 stress values in MPa.
+Designs have 10 standardized material parameters. Stress–strain responses contain 100 stress values in MPa.
 
-| File | Contents |
-|---|---|
-| `dataset.npz` | Training, validation, and test inputs and stress responses. |
-| `preprocessor.npz` | The input scaler and physical strain grid. |
-| `targets.npz` | Two OOD target curves, the strain grid, target IDs, tolerances, and response masks. |
+| File               | Contents                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------- |
+| `dataset.npz`      | Train/validation/test inputs and stress responses.                                                |
+| `preprocessor.npz` | Input scaler and physical strain grid.                                                            |
+| `targets.npz`      | The `brittle` and `plateau` OOD targets, strain grid, target IDs, tolerances, and response masks. |
 
-For each split, `X_*` has shape `(N, 100, 11)`, with 10 design parameters followed by strain at each response point, and `y_*` has shape `(N, 100)`. The two benchmark targets are `brittle` and `plateau`.
+Per split, `X_*` has shape `(N, 100, 11)`—10 design parameters followed by strain—and `y_*` has shape `(N, 100)`.
 
 ### Generated results
 
