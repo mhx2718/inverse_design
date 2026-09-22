@@ -15,6 +15,6 @@ diffusion:
   sampling_batch_size: 128
   seed: 0
 parameters:
-  pool_size: 40000
-  n_output: 4000
-  seed: 0
+  pool_size: 2000
+  n_output: 200
+  selection: maxmin

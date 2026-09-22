@@ -5,5 +5,5 @@ parameters:
   design_dimension: 10
   elite_count: 30
   kept_parent_count: 30
-  top_k: 4000
+  top_k: 200
   seed: 0

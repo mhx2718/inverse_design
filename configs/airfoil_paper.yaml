@@ -38,7 +38,7 @@ likelihood:
   backend: mvnun
   covariance_scale: 0.004325925666499213
   covariance_jitter: 1.01e-06
-  max_points: 200000
+  max_points: 100000
 support_search:
   optimizer: pso
   n_particles: 80
@@ -50,8 +50,8 @@ support_search:
   upper_bound: 3.0
   nonzero_threshold: 1.0e-10
   coverage_weight: 1.0
-  support_covariance_jitter: 0.001
-  distance_statistic: squared
+  support_covariance_jitter: 0
+  distance_statistic: mahalanobis
 mcmc:
   dimension: 16
   num_chains: 1
@@ -67,4 +67,5 @@ mcmc:
   progress: true
 output:
   unique_decimals: null
-  n_output: null
+  n_output: 50
+  selection: random

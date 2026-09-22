@@ -3,3 +3,4 @@ cdm_config: configs/airfoil/baselines/cdm.yaml
 parameters:
   n_output: 50
   zero_likelihood_tolerance: 1.0e-12
+  

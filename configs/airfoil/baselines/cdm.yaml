@@ -20,4 +20,4 @@ diffusion:
 parameters:
   pool_size: 35000
   n_output: 50
-  seed: 0
+  selection: random

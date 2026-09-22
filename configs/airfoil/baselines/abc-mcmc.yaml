@@ -10,9 +10,9 @@ mcmc:
   production_accepts: 35000
   max_steps: 100000000
   initial_covariance_scale: 0.0196
-  adaptation_scale: 1.0
+  adaptation_scale: 2.38
   covariance_jitter: 1.0e-6
-  temperature: 1.0
+  temperature: 0.15
   seed: 0
   keep_every_state: true
   progress: true

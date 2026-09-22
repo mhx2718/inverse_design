@@ -7,7 +7,7 @@ parameters:
   initial_lower_bound: -6.0
   initial_upper_bound: 6.0
   mutation_probability: 0.30
-  mutation_standard_deviation: 1.0
+  mutation_standard_deviation: 1
   elite_count: 30
   kept_parent_count: 30
   top_k: 50

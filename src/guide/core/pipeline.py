@@ -22,6 +22,65 @@ class GUIDeGenerationConfig:
     unique_decimals: int | None = None
     n_output: int | None = None
     permit_low_support_sampling: bool = False
+    selection: str = "linspace"
+
+    def __post_init__(self) -> None:
+        if self.selection not in {"linspace", "random", "maxmin"}:
+            raise ValueError("selection must be 'linspace', 'random', or 'maxmin'.")
+        if self.n_output is not None and (
+            isinstance(self.n_output, (bool, np.bool_))
+            or not isinstance(self.n_output, (int, np.integer))
+            or self.n_output <= 0
+        ):
+            raise ValueError("n_output must be a positive integer or null.")
+
+
+def select_output_indices(
+    designs: np.ndarray,
+    n_output: int | None,
+    *,
+    selection: str,
+    seed: int,
+) -> np.ndarray:
+    """Select rows after sampling; max-min uses standardized design coordinates.
+
+    Random selection samples chain rows without replacement, preserving their
+    empirical sampling weights. Max-min starts from a seeded random row and
+    greedily maximizes the minimum Euclidean distance to the selected set.
+    It stops if all remaining rows duplicate a selected design.
+    """
+    n_candidates = designs.shape[0]
+    if n_output is None or n_candidates == 0:
+        return np.arange(n_candidates, dtype=int)
+    n_select = min(n_output, n_candidates)
+    if selection == "linspace":
+        return np.linspace(0, n_candidates - 1, n_select, dtype=int)
+
+    rng = np.random.default_rng(seed)
+    if selection == "random":
+        return rng.choice(n_candidates, size=n_select, replace=False)
+    if selection != "maxmin":
+        raise ValueError("selection must be 'linspace', 'random', or 'maxmin'.")
+
+    selected = np.empty(n_select, dtype=int)
+    minimum_squared_distance = np.full(n_candidates, np.inf)
+    next_index = int(rng.integers(n_candidates))
+    for position in range(n_select):
+        selected[position] = next_index
+        if position + 1 == n_select:
+            return selected
+        difference = designs - designs[next_index]
+        squared_distance = np.einsum("ij,ij->i", difference, difference)
+        np.minimum(
+            minimum_squared_distance,
+            squared_distance,
+            out=minimum_squared_distance,
+        )
+        minimum_squared_distance[selected[: position + 1]] = -np.inf
+        next_index = int(np.argmax(minimum_squared_distance))
+        if minimum_squared_distance[next_index] <= 0.0:
+            return selected[: position + 1]
+    return selected
 
 
 class GUIDeGenerator:
@@ -67,15 +126,15 @@ class GUIDeGenerator:
                 decimals=self.config.unique_decimals
             )
 
-        if self.config.n_output is not None and designs.shape[0] > self.config.n_output:
-            indices = np.linspace(
-                0,
-                designs.shape[0] - 1,
-                self.config.n_output,
-                dtype=int,
-            )
-            designs = designs[indices]
-            log_probability = log_probability[indices]
+        n_candidates = designs.shape[0]
+        indices = select_output_indices(
+            designs,
+            self.config.n_output,
+            selection=self.config.selection,
+            seed=self.config.mcmc.seed,
+        )
+        designs = designs[indices]
+        log_probability = log_probability[indices]
 
         predictions = self.likelihood.forward_model.predict_mean(designs)
         return GenerationResult(
@@ -92,5 +151,10 @@ class GUIDeGenerator:
                 "attempted_steps": chain.attempted_steps,
                 "production_steps": chain.production_steps,
                 "temperature": self.config.mcmc.temperature,
+                "output_selection": self.config.selection if self.config.n_output is not None else "all",
+                "selection_seed": self.config.mcmc.seed,
+                "selection_coordinates": "standardized_design",
+                "n_candidates": n_candidates,
+                "n_output": len(indices),
             },
         )

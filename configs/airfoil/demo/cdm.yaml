@@ -4,3 +4,4 @@ diffusion:
 parameters:
   pool_size: 2
   n_output: 2
+  selection: maxmin

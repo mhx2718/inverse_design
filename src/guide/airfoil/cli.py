@@ -311,6 +311,7 @@ def run_from_args(arguments: argparse.Namespace) -> Path:
                 mcmc=MCMCConfig(**common["mcmc"]),
                 unique_decimals=output_settings.get("unique_decimals"),
                 n_output=output_settings.get("n_output"),
+                selection=output_settings.get("selection", "linspace"),
             ),
         )
         generation = generator.run(target)
